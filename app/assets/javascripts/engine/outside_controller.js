@@ -1,3 +1,8 @@
+/**
+ * Controller for outside events
+ * @param core Longpost core object
+ * @constructor
+ */
 longpost.OutsideController = function(core){
 
   longpost.EventDispatcher.prototype.apply(this);
@@ -44,6 +49,10 @@ longpost.OutsideController = function(core){
 
   }
 
+  /**
+   * Initialize click event
+   * @private
+   */
   function _initClickEvent(){
 
     _core.getCanvas().on('mouse:down', function(){
@@ -97,6 +106,11 @@ longpost.OutsideController = function(core){
 
   }
 
+  /**
+   * Handle key down
+   * @param e Event args
+   * @private
+   */
   function _onKeyDown(e) {
 
     //console.log(e);

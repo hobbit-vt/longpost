@@ -17,6 +17,8 @@
 //= require fabric.js
 //= require extitext.js
 //= require engine/main.js
+//= require engine/helper.js
+//= require engine/object_processor.js
 //= require engine/event_dispatcher.js
 //= require engine/outside_controller.js
 //= require engine/core.js

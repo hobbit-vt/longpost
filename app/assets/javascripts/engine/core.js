@@ -1,3 +1,8 @@
+/**
+ * Core for longpost engine
+ * @param domElement Dom element for action
+ * @constructor
+ */
 longpost.Core = function(domElement){
 
   var self = this;
@@ -20,14 +25,18 @@ longpost.Core = function(domElement){
   var _resizingCanvas = null;
 
   var _outsideController = null;
+  var _objectsProcessor = null;
 
   function constructor(){
 
     _initContainer();
+    _objectsProcessor = new longpost.ObjectProcessor(_canvas);
+
     _outsideController = new longpost.OutsideController(self);
     _outsideController.addEvent(_outsideController.EVENT.drop, self.addImage);
     _outsideController.addEvent(_outsideController.EVENT.delete, _deleteCurrentSelection);
     _outsideController.addEvent(_outsideController.EVENT.clearSelection, _clearSelection);
+    _outsideController.addEvent(_outsideController.EVENT.back, _onBack);
 
     _canvas.on('mouse:down', _onCanvasMouseDown);
     _canvas.on('object:modified', _onObjectsModified);
@@ -70,7 +79,7 @@ longpost.Core = function(domElement){
       fontFamily: 'Arial',
       padding: 15
     });
-    _canvas.add(text);
+    _objectsProcessor.add([text]);
   };
 
   /**
@@ -95,7 +104,7 @@ longpost.Core = function(domElement){
               top: mostLowerBounds.top + mostLowerBounds.height
             });
           }
-          _canvas.add(img);
+          _objectsProcessor.add([img]);
           _optimizeCanvasSize();
         }
       );
@@ -338,21 +347,26 @@ longpost.Core = function(domElement){
     }
   }
 
+  /**
+   * Delete selected objects
+   * @private
+   */
   function _deleteCurrentSelection(){
 
     if(_canvas.getActiveGroup()) {
 
-      _canvas.getActiveGroup().forEachObject( function(o){
-        _canvas.remove(o);
-      }, self);
-      _canvas.discardActiveGroup().renderAll();
+      _objectsProcessor.remove(_canvas.getActiveGroup().getObjects())
 
     } else {
 
-      _canvas.remove(_canvas.getActiveObject());
+      _objectsProcessor.remove([ _canvas.getActiveObject() ]);
     }
   }
 
+  /**
+   * Clear selected objects
+   * @private
+   */
   function _clearSelection(){
 
     if(_canvas.getActiveGroup()) {
@@ -368,6 +382,10 @@ longpost.Core = function(domElement){
 
   }
 
+  /**
+   * handle mouse down on canvas
+   * @private
+   */
   function _onCanvasMouseDown(){
 
     var allTextObjects = self.getTextObjects();
@@ -377,15 +395,35 @@ longpost.Core = function(domElement){
     }
   }
 
+  /**
+   * Handle, that object was modified
+   * @param e Event args
+   * @private
+   */
   function _onObjectsModified(e){
 
-    console.log(e);
+    _objectsProcessor.modified(e.target._objects ? e.target._objects : [e.target]);
     _optimizeCanvasSize();
   }
 
+  /**
+   * Handle, that object was moved
+   * @param e Event args
+   * @private
+   */
   function _onObjectMoving(e) {
 
     _processSnapToSmth(e.target);
+  }
+
+  /**
+   * Handle press back hotkey
+   * @private
+   */
+  function _onBack(){
+
+    _objectsProcessor.back();
+    _optimizeCanvasSize();
   }
 
   constructor();

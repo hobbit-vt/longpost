@@ -1,5 +1,13 @@
+/**
+ * Interface for events
+ * @constructor
+ */
 longpost.EventDispatcher = function(){};
 
+/**
+ * Apply event interface to some object
+ * @param object
+ */
 longpost.EventDispatcher.prototype.apply = function(object){
 
   object.addEvent = longpost.EventDispatcher.prototype.addEvent;
@@ -8,6 +16,11 @@ longpost.EventDispatcher.prototype.apply = function(object){
 
 };
 
+/**
+ * Add event to object
+ * @param type Type of event
+ * @param listener Function for handle that event
+ */
 longpost.EventDispatcher.prototype.addEvent = function ( type, listener ) {
   if ( this._listeners === undefined ) this._listeners = {};
 
@@ -22,6 +35,11 @@ longpost.EventDispatcher.prototype.addEvent = function ( type, listener ) {
   }
 };
 
+/**
+ * Remove event from object
+ * @param type Type of event
+ * @param listener Function for handle that event
+ */
 longpost.EventDispatcher.prototype.removeEvent = function ( type, listener ) {
 
   if ( this._listeners === undefined ) return;
@@ -43,12 +61,17 @@ longpost.EventDispatcher.prototype.removeEvent = function ( type, listener ) {
 
 };
 
-longpost.EventDispatcher.prototype.dispatchEvent = function ( event, args ) {
+/**
+ * Fire event from object
+ * @param type Type of event
+ * @param args Event arguments
+ */
+longpost.EventDispatcher.prototype.dispatchEvent = function ( type, args ) {
 
   if ( this._listeners === undefined ) return;
 
   var listeners = this._listeners;
-  var listenerArray = listeners[ event ];
+  var listenerArray = listeners[ type ];
 
   if ( listenerArray !== undefined ) {
 
