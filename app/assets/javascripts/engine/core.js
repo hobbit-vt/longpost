@@ -40,7 +40,7 @@ longpost.Core = function(domElement){
 
     _canvas.on('mouse:down', _onCanvasMouseDown);
     _canvas.on('object:modified', _onObjectsModified);
-    _canvas.on('object:selected', function(e){ e.target.set(DEFAULT_OPTIONS); });
+    _canvas.on('object:selected', _onObjectsSelected);
     _canvas.on('object:moving', _onObjectMoving);
   }
 
@@ -416,12 +416,20 @@ longpost.Core = function(domElement){
     _processSnapToSmth(e.target);
   }
 
+  function _onObjectsSelected(e){
+
+    e.target.set(DEFAULT_OPTIONS);
+    //e.target.setOriginX('left');
+    //e.target.setOriginY('top');
+  }
+
   /**
    * Handle press back hotkey
    * @private
    */
   function _onBack(){
 
+    _clearSelection();
     _objectsProcessor.back();
     _optimizeCanvasSize();
   }

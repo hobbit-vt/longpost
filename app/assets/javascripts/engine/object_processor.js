@@ -1,3 +1,8 @@
+/**
+ * Processor for object on canvas (add/remove/modification/back operations)
+ * @param canvas Fabric canvas
+ * @constructor
+ */
 longpost.ObjectProcessor = function(canvas){
 
   var self = this;
@@ -48,7 +53,8 @@ longpost.ObjectProcessor = function(canvas){
       ids.push(longpost.Helper.generateUUID());
       _objects[ids[ids.length - 1]] = addingObjects[i];
 
-      canvas.add(addingObjects[i])
+      canvas.add(addingObjects[i]);
+      addingObjects[i].savePrev();
     }
 
     _backStack.push({
@@ -88,8 +94,9 @@ longpost.ObjectProcessor = function(canvas){
 
     for(var i = 0; i < ids.length; i++){
 
-      props.push(longpost.Helper.clone(objects[i].originalState));
-      objects[i].saveState();
+      props.push(longpost.Helper.clone(objects[i].prevProps));
+      console.log(objects[i].prevProps);
+      objects[i].savePrev();
     }
 
     _backStack.push({
@@ -114,6 +121,7 @@ longpost.ObjectProcessor = function(canvas){
       for(iter = 0; iter < stackItem.ids.length; iter++){
 
         canvas.remove(_objects[stackItem.ids[iter]]);
+        delete _objects[stackItem.ids[iter]];
       }
     } else if (stackItem.action === ACTION.remove) {
 
@@ -126,7 +134,8 @@ longpost.ObjectProcessor = function(canvas){
       for(iter = 0; iter < stackItem.ids.length; iter++){
 
         _objects[stackItem.ids[iter]].set(stackItem.prevProps[iter]);
-        _objects[stackItem.ids[iter]].setCoords()
+        _objects[stackItem.ids[iter]].setCoords();
+        _objects[stackItem.ids[iter]].savePrev();
       }
     }
     canvas.renderAll();

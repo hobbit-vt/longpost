@@ -1,5 +1,7 @@
+/**
+ * Any helper functions
+ */
 longpost.Helper = {
-
   /**
    * Generate random UUID
    * @returns {string}
@@ -33,4 +35,4 @@ longpost.Helper = {
 
     return longpost.Helper.extend({ }, object);
   }
-}
+};
