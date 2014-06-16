@@ -1,1 +1,1 @@
-[longpost.me](longpost.me)
+[http://longpost.me/](http://longpost.me/)
