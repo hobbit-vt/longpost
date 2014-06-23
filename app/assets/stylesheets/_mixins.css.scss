@@ -1,0 +1,21 @@
+@mixin no-select() {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin transition($t_options) {
+  -webkit-transition: $t_options;
+  -moz-transition: $t_options;
+  -o-transition: $t_options;
+  transition: $t_options;
+}
+
+@mixin transform($t_options) {
+  -moz-transform: $t_options;
+  -ms-transform: $t_options;
+  -webkit-transform: $t_options;
+  -o-transform: $t_options;
+  transform: $t_options;
+}

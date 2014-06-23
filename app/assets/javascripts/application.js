@@ -12,7 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require turbolinks
+//= require jquery.top_sticker
+//= require jquery.draggable
 
 //= require fabric.js
 //= require extitext.js

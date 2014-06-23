@@ -33,7 +33,7 @@ longpost.Core = function(domElement){
     _objectsProcessor = new longpost.ObjectProcessor(_canvas);
 
     _outsideController = new longpost.OutsideController(self);
-    _outsideController.addEvent(_outsideController.EVENT.drop, self.addImage);
+    _outsideController.addEvent(_outsideController.EVENT.imageDrop, self.addImage);
     _outsideController.addEvent(_outsideController.EVENT.delete, _deleteCurrentSelection);
     _outsideController.addEvent(_outsideController.EVENT.clearSelection, _clearSelection);
     _outsideController.addEvent(_outsideController.EVENT.back, _onBack);

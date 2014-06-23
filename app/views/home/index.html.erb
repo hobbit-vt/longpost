@@ -1,13 +1,46 @@
-<%= session[:some_key] %>
+<div id="wrapper">
 
-<!-- <textarea name="" id="asd" cols="30" rows="10"></textarea> -->
-<div onclick="$('body').append('<image src='+ lp.getCanvas().toDataURL({format:'jpeg', quality: 0.8}) +'>')" style="width: 50px;height: 50px;">save</div>
-<div id="longpost">
+  <header>
+    <div class="inner">
+      <h1>
+        Longpost.me
+      </h1>
+      <h2>
+        Create your own long post
+      </h2>
+      <span data-save onclick="$('body').append('<image src='+ lp.getCanvas().toDataURL({format:'jpeg', quality: 0.8}) +'>')" class="no-select">Export</span>
+    </div>
+  </header>
+
+  <div id="toolbar">
+    <div class="inner clearfix">
+        <span data-toolbar-text id="text"  class="pull-left no-select toolbar-item">Text</span>
+        <span data-toolbar-clear id="clear" class="pull-left">Clear</span>
+        <span id="help" class="pull-right">Help</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="inner">
+      <div id="longpost">
+
+      </div>
+    </div>
+  </section>
+
+  <script type="text/javascript" charset="utf-8">
+
+    var lp = new longpost.Core($('#longpost'));
+
+    $('#toolbar').stick();
+
+  </script>
 
 </div>
-
-<script type="text/javascript" charset="utf-8">
-
-  var lp = new longpost.Core($("#longpost"));
-
-</script>
+<footer>
+  <div class="inner">
+    <span class="pull-right">
+      <a href="http://victorgolov.ru">victorgolov.ru</a> &copy;
+    </span>
+  </div>
+</footer>
