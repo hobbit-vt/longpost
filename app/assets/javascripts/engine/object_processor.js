@@ -5,6 +5,7 @@
  */
 longpost.ObjectProcessor = function(canvas){
 
+  longpost.EventDispatcher.prototype.apply(this);
   var self = this;
 
   /**
@@ -39,6 +40,27 @@ longpost.ObjectProcessor = function(canvas){
 
   function constructor(){
 
+    var state = _loadState();
+
+    if(state !== null) {
+
+      var addedIds = [];
+      canvas.loadFromJSON(state,
+        function(){ //callback loading
+
+          _backStack.push({
+            ids: addedIds,
+            action: ACTION.add
+          });
+          self.dispatchEvent(longpost.ObjectProcessor.EVENT.loadStateComplete);
+
+        }, function(json, object){ //callback for every loaded object
+
+          addedIds.push(longpost.Helper.generateUUID());
+          _objects[addedIds[addedIds.length - 1]] = object;
+
+        });
+    }
   }
 
   /**
@@ -61,6 +83,7 @@ longpost.ObjectProcessor = function(canvas){
       ids: ids,
       action: ACTION.add
     });
+    _saveState();
   };
 
   /**
@@ -81,6 +104,7 @@ longpost.ObjectProcessor = function(canvas){
       ids: ids,
       action: ACTION.remove
     });
+    _saveState();
   };
 
   /**
@@ -104,6 +128,7 @@ longpost.ObjectProcessor = function(canvas){
       action: ACTION.modify,
       prevProps: props
     });
+    _saveState();
   };
 
   /**
@@ -139,6 +164,7 @@ longpost.ObjectProcessor = function(canvas){
       }
     }
     canvas.renderAll();
+    _saveState();
   };
 
   /**
@@ -164,6 +190,53 @@ longpost.ObjectProcessor = function(canvas){
     return ids;
   }
 
+  /**
+   * Serializes canvas sate in local storage
+   * @private
+   */
+  function _saveState(){
+
+    var serialized = canvas.toJSON();
+
+    try {
+
+      window.localStorage.setItem(longpost.ObjectProcessor.STORAGE_KEY, JSON.stringify(serialized));
+
+    } catch(e) {
+
+      console.error('Can\'t save canvas =( It\'s so much size. Need UI error')
+    }
+
+  }
+
+  /**
+   * Deserializes canvas from local storage
+   * @returns {*|Object}
+   * @private
+   */
+  function _loadState(){
+
+    var result = null;
+    var deserialized;
+    try {
+      deserialized = window.localStorage.getItem(longpost.ObjectProcessor.STORAGE_KEY);
+    } catch (e){
+
+    }
+
+    if(deserialized) {
+
+      result = JSON.parse(deserialized);
+    }
+
+    return result;
+  }
+
   constructor();
 
+};
+longpost.ObjectProcessor.STORAGE_KEY = '_canvas_state_'
+longpost.ObjectProcessor.EVENT = {
+  saveStateError: 'saveStateError',
+  loadStateComplete: 'loadStateComplete'
 };

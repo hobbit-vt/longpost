@@ -2,7 +2,7 @@
 
   var TOOLBAR_TEXT = 'data-toolbar-text';
   var TOOLBAR_CLEAR = 'data-toolbar-clear';
-  var TOOLBAR_SAVE = 'data-save'
+  var TOOLBAR_SAVE = 'data-toolbar-save'
 
   /**
    * Controller for outside events
@@ -16,6 +16,13 @@
 
     var _core = core;
 
+    /**
+     * is true if text was dropped from toolbar
+     * @type {boolean}
+     * @private
+     */
+    var _isNeedToCancelTextToolbarClick = false;
+
     function constructor(){
 
       $(window).scroll(_onWindowScroll);
@@ -27,17 +34,6 @@
       $(window).keydown(_onKeyDown)
     }
 
-    self.EVENT = {
-      imageDrop: 'drop',
-      click: 'click',
-      back: 'back',
-      clearSelection: 'clearSelection',
-      'delete': 'delete',
-      dropText: 'dropText',
-      addText: 'text',
-      clearObjects: 'clearObjects'
-    };
-
     /**
      * Initializes toolbar buttons
      * @private
@@ -46,12 +42,17 @@
 
       var textButton = $('['+ TOOLBAR_TEXT +']');
       textButton.draggable();
+      textButton.bind('dropped', _textToolbarDropSuccess);
+      textButton.bind('mousedown', _textToolbarMouseDown);
+      textButton.bind('mouseup', _textToolbarMouseUp);
       var clearButton = $('['+ TOOLBAR_CLEAR +']');
+      clearButton.bind('click', _clearToolbarClick);
       var saveButton = $('['+ TOOLBAR_SAVE +']');
+      saveButton.bind('click', _saveToolbarClick);
     }
 
     /**
-     * initialize drag and drop functionality
+     * initializes drag and drop functionality
      * @private
      */
     function _initOutsideDragDrop(){
@@ -72,7 +73,7 @@
     }
 
     /**
-     * Initialize click event
+     * Initializes click event
      * @private
      */
     function _initClickEvent(){
@@ -102,7 +103,7 @@
           if(files[j].type.match('image')) {
             var reader = new FileReader();
             reader.onload = function (file) {
-              self.dispatchEvent(self.EVENT.imageDrop, file.target.result);
+              self.dispatchEvent(longpost.OutsideController.EVENT.imageDrop, file.target.result);
             };
             reader.readAsDataURL(files[j]);
           }
@@ -113,7 +114,7 @@
     }
 
     /**
-     * handle window scroll
+     * handles window scroll
      * @private
      */
     function _onWindowScroll(){
@@ -129,7 +130,7 @@
     }
 
     /**
-     * Handle key down
+     * Handles key down
      * @param e Event args
      * @private
      */
@@ -141,7 +142,7 @@
 
         if(e.metaKey || e.ctrlKey) {
 
-          self.dispatchEvent(self.EVENT.back);
+          self.dispatchEvent(longpost.OutsideController.EVENT.back);
           e.preventDefault();
         }
 
@@ -149,42 +150,64 @@
 
         if(e.metaKey || e.ctrlKey) {
 
-          self.dispatchEvent(self.EVENT.clearSelection);
+          self.dispatchEvent(longpost.OutsideController.EVENT.clearSelection);
           e.preventDefault();
         }
 
       } else if(e.which === 8 || e.which === 46) {
 
-        self.dispatchEvent(self.EVENT.delete);
+        self.dispatchEvent(longpost.OutsideController.EVENT.delete);
         e.preventDefault();
       }
     }
 
-    function _textToolbarClick(){
+    function _textToolbarMouseDown(){
 
+      _isNeedToCancelTextToolbarClick = false;
+    }
 
+    /**
+     * If drop text not triggered
+     * @private
+     */
+    function _textToolbarMouseUp(){
 
+      if(!_isNeedToCancelTextToolbarClick) {
+
+        self.dispatchEvent(longpost.OutsideController.EVENT.addText);
+      }
     }
 
     function _textToolbarDropSuccess(e){
 
+      _isNeedToCancelTextToolbarClick = true;
 
-
+      self.dispatchEvent(longpost.OutsideController.EVENT.dropText, { pageX: e.pageX, pageY: e.pageY });
     }
 
-    function _clearToobarClick(){
+    function _clearToolbarClick(){
 
-
-
+      self.dispatchEvent(longpost.OutsideController.EVENT.clearObjects);
     }
 
     function _saveToolbarClick(){
 
-
+      self.dispatchEvent(longpost.OutsideController.EVENT.save);
     }
 
     constructor();
 
+  };
+  longpost.OutsideController.EVENT = {
+    imageDrop: 'drop',
+    click: 'click',
+    back: 'back',
+    clearSelection: 'clearSelection',
+    'delete': 'delete',
+    dropText: 'dropText',
+    addText: 'text',
+    clearObjects: 'clearObjects',
+    save: 'save'
   };
 
 })();
