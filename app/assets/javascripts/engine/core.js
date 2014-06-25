@@ -13,7 +13,10 @@
   };
   var SNAP_PIXELS_LIMIT = 5;
   var IMAGE_QUALITY = 0.8;
+  var DEFAULT_TEXT = 'Text';
   var CLEAR_OBJECTS_MESSAGE = 'Do you really want to remove all objects from the canvas?';
+  var FONT_SIZE = 16;
+  var PADDING = 15;
 
   /**
    * Core for longpost engine
@@ -26,6 +29,7 @@
 
     var _container = $(domElement);
     var _canvas = null;
+    var _canvasOffset = null;
     var _resizingCanvas = null;
 
     var _outsideController = null;
@@ -43,6 +47,9 @@
       _outsideController.addEvent(longpost.OutsideController.EVENT.clearSelection, _clearSelection);
       _outsideController.addEvent(longpost.OutsideController.EVENT.back, _onBack);
       _outsideController.addEvent(longpost.OutsideController.EVENT.clearObjects, _onClearObjects);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.clearObjects, _onClearObjects);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.addText, _onAddText);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.dropText, _onDropText);
 
       _canvas.on('mouse:down', _onCanvasMouseDown);
       _canvas.on('object:modified', _onObjectsModified);
@@ -79,11 +86,23 @@
      */
     self.addText = function(string, position){
 
-      var text = new fabric.ExtIText("Hello, World!", DEFAULT_OPTIONS);
+      if(!string) {
+        string = DEFAULT_TEXT;
+      }
+      if(!position) {
+
+        position = {
+          x:0,
+          y:0
+        };
+      }
+      var text = new fabric.IText(string, DEFAULT_OPTIONS);
       text.set({
-        fontSize: 13,
+        fontSize: FONT_SIZE,
         fontFamily: 'Arial',
-        padding: 15
+        padding: PADDING,
+        left: position.x,
+        top: position.y
       });
       _objectsProcessor.add([text]);
     };
@@ -142,6 +161,7 @@
       _canvas = new fabric.Canvas('longpost_canvas', {
         backgroundColor: '#fff'
       });
+      _canvasOffset = $(_container).offset();
 
       _resizingCanvas = document.createElement('canvas');
     }
@@ -449,7 +469,7 @@
     }
 
     /**
-     * Handles, that user click to toolbar clear objects
+     * Handles, that user click to toolbar Clear objects
      * @private
      */
     function _onClearObjects(){
@@ -461,7 +481,46 @@
       }
     }
 
+    /**
+     * Handles, that user click to toolbar Text
+     * @private
+     */
+    function _onAddText(){
+
+      var mostLowerObject = _getMostLowerObject();
+      var pos = {};
+
+      if(mostLowerObject){
+
+        var bounds = mostLowerObject.getBoundingRect();
+        pos.y = bounds.height + bounds.top + PADDING;
+
+      } else {
+
+        pos.y = PADDING;
+      }
+      pos.x = PADDING;
+
+      self.addText(null, pos);
+    }
+
+    /**
+     * Handles, that user drop Text from toolbar
+     * @private
+     */
+    function _onDropText(e){
+
+      var pointer = _canvas.getPointer(e);
+
+      if (!(pointer.x < 0 || pointer.y < 0 ||
+        pointer.x > _canvas.width || pointer.y > _canvas.height)) {
+
+        self.addText(null, pointer);
+
+      }
+    }
+
     constructor();
 
   };
-})()
+})();

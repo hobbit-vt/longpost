@@ -59,7 +59,14 @@
 
         if(Date.now() - _mouseDownTime > DROP_DELAY) {
 
-          var event = jQuery.Event('dropped', {pageX: e.pageX, pageY: e.pageY});
+          var width = _shadowElement.width();
+          var height = _shadowElement.height();
+          var event = jQuery.Event('dropped', {
+            pageX: e.pageX - width / 2,
+            pageY: e.pageY - height / 2,
+            clientX: e.clientX - width / 2,
+            clientY: e.clientY - height / 2
+          });
           element.trigger(event);
         }
 

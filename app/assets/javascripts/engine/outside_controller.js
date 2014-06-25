@@ -182,7 +182,7 @@
 
       _isNeedToCancelTextToolbarClick = true;
 
-      self.dispatchEvent(longpost.OutsideController.EVENT.dropText, { pageX: e.pageX, pageY: e.pageY });
+      self.dispatchEvent(longpost.OutsideController.EVENT.dropText, e);
     }
 
     function _clearToolbarClick(){

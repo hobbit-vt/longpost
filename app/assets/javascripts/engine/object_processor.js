@@ -196,7 +196,7 @@ longpost.ObjectProcessor = function(canvas){
    */
   function _saveState(){
 
-    var serialized = canvas.toJSON();
+    var serialized = canvas.toJSON(['padding']);
 
     try {
 
