@@ -22,4 +22,5 @@
 //= require engine/object_processor.js
 //= require engine/event_dispatcher.js
 //= require engine/outside_controller.js
+//= require engine/exporter.js
 //= require engine/core.js

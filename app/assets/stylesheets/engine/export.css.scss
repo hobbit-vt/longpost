@@ -1,0 +1,41 @@
+$transition-delay: .25s;
+
+.exported-image {
+  -webkit-transition-duration: $transition-delay;
+  -moz-transition-duration: $transition-delay;
+  -o-transition-duration: $transition-delay;
+  transition-duration: $transition-delay;
+
+  -webkit-transition-property: transform, top, bottom, box-shadow;
+  -moz-transition-property: transform, top, bottom, box-shadow;
+  -o-transition-property: transform, top, bottom, box-shadow;
+  transition-property: transform, top, bottom, box-shadow;
+
+  -webkit-transform-origin: 50% 0;
+  -moz-transform-origin: 50% 0;
+  -o-transform-origin: 50% 0;
+  -ms-transform-origin: 50% 0;
+  transform-origin: 50% 0;
+
+  &.active {
+    -webkit-box-shadow: 0 0 40px rgba(0,0,0,.5);
+    -moz-box-shadow: 0 0 40px rgba(0,0,0,.5);
+    box-shadow: 0 0 40px rgba(0,0,0,.5);
+  }
+}
+
+.exported-overlay {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0;
+
+  -webkit-transition: opacity $transition-delay;
+  -moz-transition: opacity $transition-delay;
+  -o-transition: opacity $transition-delay;
+  transition: opacity $transition-delay;
+}

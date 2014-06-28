@@ -11,8 +11,10 @@
     width: 600,
     height: 600
   };
-  var SNAP_PIXELS_LIMIT = 5;
+  var IMAGE_FORMAT = 'jpeg';
   var IMAGE_QUALITY = 0.8;
+
+  var SNAP_PIXELS_LIMIT = 5;
   var DEFAULT_TEXT = 'Text';
   var CLEAR_OBJECTS_MESSAGE = 'Do you really want to remove all objects from the canvas?';
   var FONT_SIZE = 16;
@@ -34,12 +36,16 @@
 
     var _outsideController = null;
     var _objectsProcessor = null;
+    var _imageExporter = null;
 
     function constructor(){
 
       _initContainer();
       _objectsProcessor = new longpost.ObjectProcessor(_canvas);
       _objectsProcessor.addEvent(longpost.ObjectProcessor.EVENT.loadStateComplete, _optimizeCanvasSize);
+      _optimizeCanvasSize();
+
+      _imageExporter = new longpost.Exporter(domElement);
 
       _outsideController = new longpost.OutsideController(self);
       _outsideController.addEvent(longpost.OutsideController.EVENT.imageDrop, self.addImage);
@@ -50,6 +56,7 @@
       _outsideController.addEvent(longpost.OutsideController.EVENT.clearObjects, _onClearObjects);
       _outsideController.addEvent(longpost.OutsideController.EVENT.addText, _onAddText);
       _outsideController.addEvent(longpost.OutsideController.EVENT.dropText, _onDropText);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.save, _onSave);
 
       _canvas.on('mouse:down', _onCanvasMouseDown);
       _canvas.on('object:modified', _onObjectsModified);
@@ -518,6 +525,16 @@
         self.addText(null, pointer);
 
       }
+    }
+
+    function _onSave(){
+
+      _imageExporter.exportImage(
+        _canvas.toDataURL({
+            format: IMAGE_FORMAT,
+            quality: IMAGE_QUALITY
+        })
+      );
     }
 
     constructor();
