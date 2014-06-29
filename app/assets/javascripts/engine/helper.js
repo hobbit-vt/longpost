@@ -3,6 +3,14 @@
  */
 longpost.Helper = {
   /**
+   * Returns false =)
+   * @returns {boolean}
+   */
+  falseFunction: function() {
+
+    return false;
+  },
+  /**
    * Generate random UUID
    * @returns {string}
    */
@@ -19,7 +27,7 @@ longpost.Helper = {
    * @param source Source Where to copy from
    * @returns {Object}
    */
-  extend: function(dest, source){
+  extend: function(dest, source) {
 
     for (var property in source) {
       dest[property] = source[property];
@@ -31,7 +39,7 @@ longpost.Helper = {
    * @param object Object to clone
    * @returns {Object}
    */
-  clone: function(object){
+  clone: function(object) {
 
     return longpost.Helper.extend({ }, object);
   }

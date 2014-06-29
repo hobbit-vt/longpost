@@ -1,5 +1,9 @@
 (function(){
 
+  var WATERMARK_TEXT = 'LongPost.me';
+  var WATERMARK_SIZE = 11;
+  var WATERMARK_PADDING = 5;
+
   var DEFAULT_OPTIONS = {
     cornerColor: "#f00",
     borderColor: "#000",
@@ -12,12 +16,12 @@
     height: 600
   };
   var IMAGE_FORMAT = 'jpeg';
-  var IMAGE_QUALITY = 0.8;
+  var IMAGE_QUALITY = 0.9;
 
   var SNAP_PIXELS_LIMIT = 5;
   var DEFAULT_TEXT = 'Text';
   var CLEAR_OBJECTS_MESSAGE = 'Do you really want to remove all objects from the canvas?';
-  var FONT_SIZE = 16;
+  var FONT_SIZE = 18;
   var PADDING = 15;
 
   /**
@@ -38,14 +42,18 @@
     var _objectsProcessor = null;
     var _imageExporter = null;
 
+    var _waterMark;
+
     function constructor(){
 
       _initContainer();
+      _initWaterMark();
       _objectsProcessor = new longpost.ObjectProcessor(_canvas);
       _objectsProcessor.addEvent(longpost.ObjectProcessor.EVENT.loadStateComplete, _optimizeCanvasSize);
       _optimizeCanvasSize();
 
       _imageExporter = new longpost.Exporter(domElement);
+      _imageExporter.addEvent(longpost.Exporter.EVENT.cancel, _onCancelExport)
 
       _outsideController = new longpost.OutsideController(self);
       _outsideController.addEvent(longpost.OutsideController.EVENT.imageDrop, self.addImage);
@@ -57,11 +65,17 @@
       _outsideController.addEvent(longpost.OutsideController.EVENT.addText, _onAddText);
       _outsideController.addEvent(longpost.OutsideController.EVENT.dropText, _onDropText);
       _outsideController.addEvent(longpost.OutsideController.EVENT.save, _onSave);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.selectAll, _selectAll);
 
       _canvas.on('mouse:down', _onCanvasMouseDown);
       _canvas.on('object:modified', _onObjectsModified);
+      _canvas.on('text:changed', _onObjectsModified);
       _canvas.on('object:selected', _onObjectsSelected);
+
       _canvas.on('object:moving', _onObjectMoving);
+
+      $('body').bind('mousedown', _clearSelection);
+      _container.bind('mousedown', longpost.Helper.falseFunction);
     }
 
     /**
@@ -131,7 +145,7 @@
 
             if(mostLowerObject) {
 
-              var mostLowerBounds = mostLowerObject.getBoundingRect();
+              var mostLowerBounds = mostLowerObject.getBoundingRectSafely();
               img.set({
                 top: mostLowerBounds.top + mostLowerBounds.height
               });
@@ -200,7 +214,7 @@
           mostLowerResult;
       for(var i = 0; i < _canvas._objects.length; i++){
 
-        objectBounds = _canvas.item(i).getBoundingRect();
+        objectBounds = _canvas.item(i).getBoundingRectSafely();
         objectLowerY = objectBounds.top + objectBounds.height;
 
         if(objectLowerY > mostLowerY){
@@ -222,7 +236,7 @@
       var mostLowerObject = _getMostLowerObject();
       if(mostLowerObject){
 
-        var bounds = mostLowerObject.getBoundingRect();
+        var bounds = mostLowerObject.getBoundingRectSafely();
         var maxY = bounds.height + bounds.top;
 
         if(maxY > DEFAULT_SIZE.width){
@@ -272,49 +286,92 @@
      * @param object
      * @private
      */
-    function _processSnapToSmth(object){
+    function _processStickToSmth(object){
+      console.time('s');
+      var objProps = object.getPropertiesSafely();
+
+      console.log(objProps);
+
+      var div,
+          groupAddition = {
+            left: object.type === 'group' ? object.width / 2 : 0,
+            top: object.type === 'group' ? object.height / 2 : 0
+          };
+      var nearestVertical = {
+        div: 0,
+        action: null
+      };
+      var nearestHorizontal = {
+        div: 0,
+        action: null
+      };
+
 
       //to left side
-      if(Math.abs(object.left - object.padding) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.left - object.padding);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          left: object.padding
-        });
+        nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+        nearestHorizontal.action = function(){
+          object.set({
+            left: object.padding + groupAddition.left
+          });
+        };
       }
       //to right side
-      if(Math.abs(object.left + (object.width * object.scaleX + object.padding) - DEFAULT_SIZE.width) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.left + (object.width * objProps.scaleX + object.padding) - DEFAULT_SIZE.width);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          left: DEFAULT_SIZE.width - (object.width * object.scaleX + object.padding)
-        });
+        nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+        nearestHorizontal.action = function() {
+          object.set({
+            left: DEFAULT_SIZE.width - (object.width * objProps.scaleX + object.padding) + groupAddition.left
+          });
+        };
       }
       //to top
-      if(Math.abs(object.top - object.padding) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.top - object.padding);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          top: object.padding
-        });
+        nearestVertical.div = nearestVertical.div > div ? div : nearestVertical.div;
+        nearestVertical.action = function() {
+          object.set({
+            top: object.padding + groupAddition.top
+          });
+        };
       }
       //to center
-      if(Math.abs(object.left + object.width  * object.scaleX / 2 - DEFAULT_SIZE.width / 2) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.left + object.width  * objProps.scaleX / 2 - DEFAULT_SIZE.width / 2);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          left: DEFAULT_SIZE.width / 2 - object.width  * object.scaleX / 2
-        });
+        nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+        nearestHorizontal.action = function() {
+          object.set({
+            left: DEFAULT_SIZE.width / 2 - object.width * objProps.scaleX / 2 + groupAddition.left
+          });
+        };
       }
       //left side to center
-      if(Math.abs(object.left - object.padding - DEFAULT_SIZE.width / 2) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.left - object.padding - DEFAULT_SIZE.width / 2);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          left: DEFAULT_SIZE.width / 2 + object.padding
-        });
+        nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+        nearestHorizontal.action = function() {
+          object.set({
+            left: DEFAULT_SIZE.width / 2 + object.padding + groupAddition.left
+          });
+        };
       }
       //right side to center
-      if(Math.abs(object.left + (object.width * object.scaleX + object.padding) - DEFAULT_SIZE.width / 2) < SNAP_PIXELS_LIMIT) {
+      div = Math.abs(objProps.left + (object.width * objProps.scaleX + object.padding) - DEFAULT_SIZE.width / 2);
+      if(div < SNAP_PIXELS_LIMIT) {
 
-        object.set({
-          left: DEFAULT_SIZE.width / 2 - (object.width * object.scaleX + object.padding)
-        });
+        nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+        nearestHorizontal.action = function() {
+          object.set({
+            left: DEFAULT_SIZE.width / 2 - (object.width * objProps.scaleX + object.padding) + groupAddition.left
+          });
+        };
       }
 
       var i, smthObj;
@@ -322,65 +379,124 @@
 
         smthObj = _canvas.item(i);
         if(smthObj === object) continue;
+        if(object._objects) {
+          var needContinue = object._objects.some(function(val){
+            return smthObj === val
+          });
+          if(needContinue) continue;
+        }
 
         //left side to left side smth
-        if(Math.abs((smthObj.left - smthObj.padding) - (object.left - object.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((smthObj.left - smthObj.padding) - (objProps.left - object.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            left: smthObj.left - smthObj.padding + object.padding
-          });
+          nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+          (function(obj){
+            nearestHorizontal.action = function() {
+              object.set({
+                left: obj.left - obj.padding + object.padding + groupAddition.left
+              });
+            };
+          })(smthObj);
         }
         //left side to right side smth
-        if(Math.abs((smthObj.left + smthObj.width * smthObj.scaleX + smthObj.padding) - (object.left - object.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((smthObj.left + smthObj.width * smthObj.scaleX + smthObj.padding) - (objProps.left - object.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            left: smthObj.left + smthObj.width * smthObj.scaleX + smthObj.padding + object.padding
-          });
+          nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+          (function(obj){
+            nearestHorizontal.action = function() {
+              object.set({
+                left: obj.left + obj.width * obj.scaleX + obj.padding + object.padding + groupAddition.left
+              });
+            }
+          })(smthObj);
         }
         //right side to left side smth
-        if(Math.abs((object.left + object.width * object.scaleX + object.padding) - (smthObj.left - smthObj.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((objProps.left + object.width * objProps.scaleX + object.padding) - (smthObj.left - smthObj.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            left: (smthObj.left - smthObj.padding) - (object.width * object.scaleX + object.padding)
-          });
+          nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+          (function(obj){
+            nearestHorizontal.action = function() {
+              object.set({
+                left: (obj.left - obj.padding) - (object.width * objProps.scaleX + object.padding) + groupAddition.left
+              });
+            }
+          })(smthObj);
         }
         //right side to right side smth
-        if(Math.abs((object.left + object.width * object.scaleX + object.padding) - (smthObj.left + smthObj.width * smthObj.scaleX  + smthObj.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((objProps.left + object.width * objProps.scaleX + object.padding) - (smthObj.left + smthObj.width * smthObj.scaleX + smthObj.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            left: (smthObj.left + smthObj.width * smthObj.scaleX + smthObj.padding) - (object.width * object.scaleX  + object.padding)
-          });
+          nearestHorizontal.div = nearestHorizontal.div > div ? div : nearestHorizontal.div;
+          (function(obj){
+            nearestHorizontal.action = function() {
+              object.set({
+                left: (obj.left + obj.width * obj.scaleX + obj.padding) - (object.width * objProps.scaleX + object.padding) + groupAddition.left
+              });
+            }
+          })(smthObj);
         }
 
         //top side to top side smth
-        if(Math.abs((smthObj.top - smthObj.padding) - (object.top - object.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((smthObj.top - smthObj.padding) - (objProps.top - object.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            top: smthObj.top - smthObj.padding + object.padding
-          });
+          nearestVertical.div = nearestVertical.div > div ? div : nearestVertical.div;
+          (function(obj){
+            nearestVertical.action = function(){
+              object.set({
+                top: obj.top - obj.padding + object.padding + groupAddition.top
+              });
+            };
+          })(smthObj);
         }
         //top side to down side smth
-        if(Math.abs((smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding) - (object.top - object.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding) - (objProps.top - object.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            top: smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding + object.padding
-          });
+          nearestVertical.div = nearestVertical.div > div ? div : nearestVertical.div;
+          (function(obj){
+            nearestVertical.action = function(){
+              object.set({
+                top: obj.top + obj.height * obj.scaleX + obj.padding + object.padding + groupAddition.top
+              });
+            };
+          })(smthObj);
         }
         //down side to top side smth
-        if(Math.abs((object.top + object.height * object.scaleX + object.padding) - (smthObj.top - smthObj.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((objProps.top + object.height * objProps.scaleX + object.padding) - (smthObj.top - smthObj.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            top: (smthObj.top - smthObj.padding) - (object.height * object.scaleX + object.padding)
-          });
+          nearestVertical.div = nearestVertical.div > div ? div : nearestVertical.div;
+          (function(obj){
+            nearestVertical.action = function(){
+              object.set({
+                top: (obj.top - obj.padding) - (object.height * objProps.scaleX + object.padding) + groupAddition.top
+              });
+            };
+          })(smthObj);
         }
         //down side to down side smth
-        if(Math.abs((object.top + object.height * object.scaleX + object.padding) - (smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding)) < SNAP_PIXELS_LIMIT) {
+        div = Math.abs((objProps.top + object.height * objProps.scaleX + object.padding) - (smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding));
+        if(div < SNAP_PIXELS_LIMIT) {
 
-          object.set({
-            top: (smthObj.top + smthObj.height * smthObj.scaleX + smthObj.padding) - (object.height * object.scaleX  + object.padding)
-          });
+          nearestVertical.div = nearestVertical.div > div ? div : nearestVertical.div;
+          (function(obj){
+            nearestVertical.action = function(){
+              object.set({
+                top: (obj.top + obj.height * obj.scaleX + obj.padding) - (object.height * objProps.scaleX + object.padding) + groupAddition.top
+              });
+            };
+          })(smthObj);
         }
       }
+
+      //if need to stick to something
+      nearestHorizontal.action && nearestHorizontal.action();
+      nearestVertical.action && nearestVertical.action();
+      console.timeEnd('s');
     }
 
     /**
@@ -419,6 +535,54 @@
     }
 
     /**
+     * Selects all object on canvas
+     * @private
+     */
+    function _selectAll(){
+
+      if(_canvas.getObjects().length > 0) {
+
+        _clearSelection();
+
+        var objs = _canvas.getObjects().map(function (o) {
+          return o.set('active', true);
+        });
+
+        var group = new fabric.Group(objs, {
+          originX: 'center',
+          originY: 'center'
+        });
+
+        _canvas._activeObject = null;
+
+        _canvas.setActiveGroup(group.setCoords()).renderAll();
+      }
+    }
+
+    function _initWaterMark(){
+
+      _waterMark = new fabric.Text(WATERMARK_TEXT, {
+        fontSize: WATERMARK_SIZE,
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+        left: WATERMARK_PADDING
+      });
+    }
+
+    function _printWaterMark() {
+
+      _waterMark.set({
+        top: _canvas.height - _waterMark.height - WATERMARK_PADDING
+      });
+      _canvas.add(_waterMark);
+    }
+
+    function _removeWaterMark() {
+
+      _canvas.remove(_waterMark);
+    }
+
+    /**
      * handle mouse down on canvas
      * @private
      */
@@ -449,7 +613,7 @@
      */
     function _onObjectMoving(e) {
 
-      _processSnapToSmth(e.target);
+      _processStickToSmth(e.target);
     }
 
     /**
@@ -460,8 +624,6 @@
     function _onObjectsSelected(e){
 
       e.target.set(DEFAULT_OPTIONS);
-      //e.target.setOriginX('left');
-      //e.target.setOriginY('top');
     }
 
     /**
@@ -499,7 +661,7 @@
 
       if(mostLowerObject){
 
-        var bounds = mostLowerObject.getBoundingRect();
+        var bounds = mostLowerObject.getBoundingRectSafely();
         pos.y = bounds.height + bounds.top + PADDING;
 
       } else {
@@ -509,6 +671,7 @@
       pos.x = PADDING;
 
       self.addText(null, pos);
+      _optimizeCanvasSize();
     }
 
     /**
@@ -523,18 +686,30 @@
         pointer.x > _canvas.width || pointer.y > _canvas.height)) {
 
         self.addText(null, pointer);
+        _optimizeCanvasSize();
 
       }
     }
 
+    /**
+     * Handles, that user wants to save image
+     * @private
+     */
     function _onSave(){
 
+      _clearSelection();
+      _printWaterMark();
       _imageExporter.exportImage(
         _canvas.toDataURL({
             format: IMAGE_FORMAT,
             quality: IMAGE_QUALITY
         })
       );
+    }
+
+    function _onCancelExport() {
+
+      _removeWaterMark();
     }
 
     constructor();

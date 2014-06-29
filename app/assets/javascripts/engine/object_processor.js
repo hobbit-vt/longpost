@@ -76,7 +76,7 @@ longpost.ObjectProcessor = function(canvas){
       _objects[ids[ids.length - 1]] = addingObjects[i];
 
       canvas.add(addingObjects[i]);
-      addingObjects[i].savePrev();
+      addingObjects[i].saveCurrentState();
     }
 
     _backStack.push({
@@ -118,9 +118,9 @@ longpost.ObjectProcessor = function(canvas){
 
     for(var i = 0; i < ids.length; i++){
 
-      props.push(longpost.Helper.clone(objects[i].prevProps));
-      console.log(objects[i].prevProps);
-      objects[i].savePrev();
+      props.push(longpost.Helper.clone(objects[i].currentState));
+      console.log(objects[i].currentState);
+      objects[i].saveCurrentState();
     }
 
     _backStack.push({
@@ -160,7 +160,7 @@ longpost.ObjectProcessor = function(canvas){
 
         _objects[stackItem.ids[iter]].set(stackItem.prevProps[iter]);
         _objects[stackItem.ids[iter]].setCoords();
-        _objects[stackItem.ids[iter]].savePrev();
+        _objects[stackItem.ids[iter]].saveCurrentState();
       }
     }
     canvas.renderAll();
@@ -235,6 +235,7 @@ longpost.ObjectProcessor = function(canvas){
   constructor();
 
 };
+
 longpost.ObjectProcessor.STORAGE_KEY = '_canvas_state_'
 longpost.ObjectProcessor.EVENT = {
   saveStateError: 'saveStateError',

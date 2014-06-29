@@ -13,6 +13,7 @@
    */
   longpost.Exporter = function(container) {
 
+    longpost.EventDispatcher.prototype.apply(this);
     var self = this;
 
     var _enabled = false;
@@ -95,6 +96,7 @@
       _image.removeClass(ACTIVE);
 
       _setTransform(_image, 'scale(' + 1 + ')');
+      self.dispatchEvent(longpost.Exporter.EVENT.cancel);
     }
 
     /**
@@ -124,6 +126,10 @@
     }
 
     constructor();
+  };
+
+  longpost.Exporter.EVENT = {
+    cancel: 'cancel'
   };
 
   /**

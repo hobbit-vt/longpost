@@ -16,7 +16,7 @@
 //= require jquery.draggable
 
 //= require fabric.js
-//= require extitext.js
+//= require extend_fabric_object.js
 //= require engine/main.js
 //= require engine/helper.js
 //= require engine/object_processor.js

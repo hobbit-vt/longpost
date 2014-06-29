@@ -1,6 +1,7 @@
 (function($){
 
   var DROP_DELAY = 300;
+  var MAX_OFFSET = 50;
 
   $.fn.draggable = function(){
 
@@ -11,10 +12,15 @@
 
     var _isMouseDown = false;
     var _mouseDownTime = null;
+
+    var _elementPosition;
+
     var _shadowElement = null;
     var _shadowElementMouseOffset = null;
 
     function constructor(){
+
+      _elementPosition = element.offset();
 
       element.bind('mousedown', _mouseDown);
       $(window).bind('mouseup', _mouseUp);
@@ -27,7 +33,7 @@
       _mouseDownTime = Date.now();
       var body = $('body');
       body.bind('mousemove', _mouseMove);
-      body.bind('selectstart', falseFunction);
+      body.bind('selectstart', longpost.Helper.falseFunction);
 
       var offset = element.offset();
       _shadowElement = _createShadowElement();
@@ -57,7 +63,13 @@
 
       if(_isMouseDown) {
 
-        if(Date.now() - _mouseDownTime > DROP_DELAY) {
+        var _shadowElementPosition = _shadowElement.offset();
+
+        if(
+          Math.abs(_shadowElementPosition.top - _elementPosition.top) > MAX_OFFSET ||
+          Math.abs(_shadowElementPosition.left - _elementPosition.left) > MAX_OFFSET ||
+          Date.now() - _mouseDownTime > DROP_DELAY
+        ) {
 
           var width = _shadowElement.width();
           var height = _shadowElement.height();
@@ -84,7 +96,7 @@
 
       var body = $('body');
       body.unbind('mousemove', _mouseMove);
-      body.unbind('selectstart', falseFunction);
+      body.unbind('selectstart', longpost.Helper.falseFunction);
 
       if(_shadowElement) {
 
@@ -109,9 +121,5 @@
     opacity: 0.5,
     position: 'absolute'
   };
-
-  function falseFunction(){
-    return false;
-  }
 
 })(jQuery);

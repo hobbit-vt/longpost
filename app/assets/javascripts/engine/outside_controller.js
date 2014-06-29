@@ -28,7 +28,6 @@
       $(window).scroll(_onWindowScroll);
 
       _initOutsideDragDrop();
-      _initClickEvent();
       _initToolbar();
 
       $(window).keydown(_onKeyDown)
@@ -70,20 +69,6 @@
         drop: _outsideDropSuccess
       });
 
-    }
-
-    /**
-     * Initializes click event
-     * @private
-     */
-    function _initClickEvent(){
-
-      _core.getCanvas().on('mouse:down', function(){
-
-      });
-      _core.getCanvas().on('mouse:up', function(){
-
-      });
     }
 
     /**
@@ -136,8 +121,6 @@
      */
     function _onKeyDown(e) {
 
-      //console.log(e);
-
       if(e.which === 90) { // press z
 
         if(e.metaKey || e.ctrlKey) {
@@ -154,10 +137,18 @@
           e.preventDefault();
         }
 
-      } else if(e.which === 8 || e.which === 46) {
+      } else if(e.which === 8 || e.which === 46) { // press delete or backspace
 
         self.dispatchEvent(longpost.OutsideController.EVENT.delete);
         e.preventDefault();
+
+      } else if(e.which === 65) { // press a
+
+        if(e.metaKey || e.ctrlKey) {
+
+          self.dispatchEvent(longpost.OutsideController.EVENT.selectAll);
+          e.preventDefault();
+        }
       }
     }
 
@@ -198,9 +189,11 @@
     constructor();
 
   };
+
   longpost.OutsideController.EVENT = {
     imageDrop: 'drop',
     click: 'click',
+    selectAll: 'selectAll',
     back: 'back',
     clearSelection: 'clearSelection',
     'delete': 'delete',
