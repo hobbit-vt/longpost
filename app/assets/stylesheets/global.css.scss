@@ -10,13 +10,15 @@ $footer_height: 30px;
   box-sizing: border-box;
 }
 
-html, body {
+html, body, .page {
   height: 100%;
 }
 
 #wrapper {
   min-height: 100%;
   margin-bottom: -$footer_height;
+  background: #fafafa url("body-bg.jpg");
+
   &:after {
     content: "";
     display: block;
@@ -32,8 +34,8 @@ body, h1, h2, h3, h4, h5, h6, p, ul, input {
 body {
   font: 1em 'Helvetica Neue', Helvetica, Arial, serif;
   line-height: 1.5;
-  background: #fafafa url("body-bg.jpg");
   font-weight: 400;
+  background: #333;
   font-size: $base_font_size;
   color: #666;
   overflow-y: scroll;

@@ -1,52 +1,67 @@
-<div id="wrapper">
+<div class="page">
+  <div id="wrapper">
 
-  <header>
-    <div class="inner">
-      <h1>
-        Longpost.me
-      </h1>
-      <h2>
-        Create your own long post
-      </h2>
-      <span data-toolbar-save class="no-select">Export</span>
-    </div>
-  </header>
+    <header>
+      <div class="inner">
+        <h1>
+          Longpost.me
+        </h1>
+        <h2>
+          Create your own long post
+        </h2>
+        <span data-toolbar-save class="no-select">Export</span>
+      </div>
+    </header>
 
-  <div id="toolbar">
-    <div class="inner clearfix">
-        <span data-toolbar-text id="text"  class="pull-left no-select toolbar-item">Text</span>
-        <span data-toolbar-clear id="clear" class="pull-left">Clear</span>
-        <span id="help" class="pull-right">Help</span>
-    </div>
-  </div>
-
-  <section>
-    <div class="inner">
-      <div id="longpost">
-
+    <div id="toolbar">
+      <div class="inner clearfix">
+          <span data-toolbar-text id="text"  class="pull-left no-select toolbar-item">Text</span>
+          <span data-toolbar-clear id="clear" class="pull-left">Clear</span>
+          <span id="help" class="pull-right">Help</span>
       </div>
     </div>
-  </section>
 
-  <script type="text/javascript" charset="utf-8">
+    <section>
+      <div class="inner">
+        <div id="longpost">
 
-    var lp = new longpost.Core($('#longpost'));
+        </div>
+      </div>
+    </section>
 
-    $('#toolbar').stick();
-
-  </script>
-
-</div>
-<footer>
-  <div class="inner">
-    <span class="pull-left">
-      Architect theme by <a href="https://twitter.com/jasonlong" target="_blank">Jason Long</a>
-    </span>
-    <span class="pull-right">
-      <a href="http://victorgolov.ru" target="_blank">victorgolov.ru</a> &copy;
-    </span>
   </div>
-</footer>
+  <footer>
+    <div class="inner">
+      <span class="pull-right">
+        Architect theme by <a href="https://twitter.com/jasonlong" target="_blank">Jason Long</a>
+      </span>
+      <span class="pull-left">
+        &copy; <a href="http://victorgolov.ru" target="_blank">victorgolov.ru</a>
+      </span>
+    </div>
+  </footer>
+</div>
+
+<div class="export-main no-select">
+  <div class="export-overlay">
+    <img src="/assets/loading-cylon-red.svg" width="256" height="32" class="export-preload"/>
+  </div>
+  <div class="export-loader"></div>
+  <div class="export-header">
+    <strong>Long</strong>post
+  </div>
+  <img class="export-image">
+  <div class="export-footer">
+    <strong>Long</strong>post
+  </div>
+</div>
 
 
+<script type="text/javascript" charset="utf-8">
 
+  var exporter = new longpost.Exporter('.export-main', '.page');
+  var lp = new longpost.Core($('#longpost'), exporter);
+
+  $('#toolbar').stick();
+
+</script>

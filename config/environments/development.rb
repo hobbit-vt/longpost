@@ -31,4 +31,9 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Image config
+  config.image_path =  'images/'
+  config.image_ttl =  1.minutes
+  config.image_schedule_timer = 5.seconds
 end

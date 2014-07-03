@@ -29,7 +29,7 @@
    * @param domElement Dom element for action
    * @constructor
    */
-  longpost.Core = function(domElement){
+  longpost.Core = function(domElement, exporter){
 
     var self = this;
 
@@ -52,8 +52,8 @@
       _objectsProcessor.addEvent(longpost.ObjectProcessor.EVENT.loadStateComplete, _optimizeCanvasSize);
       _optimizeCanvasSize();
 
-      _imageExporter = new longpost.Exporter(domElement);
-      _imageExporter.addEvent(longpost.Exporter.EVENT.cancel, _onCancelExport)
+      _imageExporter = exporter;
+      _imageExporter.addEvent(longpost.Exporter.EVENT.cancel, _onCancelExport);
 
       _outsideController = new longpost.OutsideController(self);
       _outsideController.addEvent(longpost.OutsideController.EVENT.imageDrop, self.addImage);
@@ -559,6 +559,10 @@
       }
     }
 
+    /**
+     * Create a watermark
+     * @private
+     */
     function _initWaterMark(){
 
       _waterMark = new fabric.Text(WATERMARK_TEXT, {
@@ -569,6 +573,10 @@
       });
     }
 
+    /**
+     * Draws watermark at canvas
+     * @private
+     */
     function _printWaterMark() {
 
       _waterMark.set({
@@ -577,6 +585,10 @@
       _canvas.add(_waterMark);
     }
 
+    /**
+     * Remove watermark from canvas
+     * @private
+     */
     function _removeWaterMark() {
 
       _canvas.remove(_waterMark);

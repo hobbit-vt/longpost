@@ -1,127 +1,116 @@
 (function(){
 
-  var MARGIN = 10;
-  var ACTIVE = 'active';
-  var IMAGE_CLASS = 'exported-image';
-  var OVERLAY_CLASS = 'exported-overlay';
-  var OVERLAY_OPACITY = 0.5;
-
   /**
-   * Exporter controller for image
-   * @param container Container of canvas
+   * Shows export page
+   * @param container Layout for exporter
+   * @param page Main page wrapper
    * @constructor
    */
-  longpost.Exporter = function(container) {
+  longpost.Exporter = function(container, page) {
 
-    longpost.EventDispatcher.prototype.apply(this);
     var self = this;
+    longpost.EventDispatcher.prototype.apply(this);
 
-    var _enabled = false;
+    var _exportContainer,
+        _page,
+        _dontDoubleClickOverlay,
+        _image,
+        _footer,
+        _preloader;
 
-    var _image;
-    var _overlay;
-    var _defaultPosition;
+    var _isImageShowed = false;
+
 
     function constructor(){
 
-      var body = $('body');
-
-      _defaultPosition = container.offset();
-
-      _image = $('<img>').css({
-        position: 'absolute',
-        top: _defaultPosition.top,
-        left: _defaultPosition.left,
-        zIndex: 10
+      _exportContainer = $(container);
+      _page = $(page);
+      _image = _exportContainer.find('.export-image');
+      _footer = _exportContainer.find('.export-footer');
+      _preloader = _exportContainer.find('.export-preload');
+      _dontDoubleClickOverlay = $('<div>');
+      _dontDoubleClickOverlay.css({
+        opacity: 0,
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        width: '100%',
+        height: '100%',
+        display: 'none'
       });
-      _image.addClass(IMAGE_CLASS);
-      body.append(_image);
-      _bindTransitionEnd(_image, _transitionComplete);
-      _image.bind('load', _imageLoadComplete)
+      _dontDoubleClickOverlay.appendTo('body');
 
-      _overlay = $('<div>').addClass(OVERLAY_CLASS);
-      _overlay.hide();
-      body.append(_overlay);
+
+      _exportContainer.bind('click', _handleClick);
     }
 
     /**
-     * Export image
-     * @param imageUrl Image for export
+     * Begins show export window
+     * @param dataUrl Base64 image url
      */
-    self.exportImage = function(imageUrl){
+    self.exportImage = function(dataUrl) {
 
-      _image.attr('src', imageUrl);
+      _dontDoubleClickOverlay.show();
+      _preloader.show();
+
+      _exportContainer.removeClass('moveToRight');
+      _page.removeClass('scaleUp');
+
+      _exportContainer.addClass('active moveFromLeft');
+      _page.addClass('scaleDown');
+
+
+      var xhr = _performUploadImage(dataUrl);
+      xhr.success(_successUploadImage);
+      xhr.error(_cancelExport)
     };
 
     /**
-     * Handles load complete for image
+     * Handles success upload image to server
+     * @param data Image url
      * @private
      */
-    function _imageLoadComplete(){
+    function _successUploadImage(data){
 
-      _showExportedImage();
+      _image.attr('src', data);
+      _isImageShowed = true;
+
+      _image.addClass('moveFromLeft');
+      _footer.addClass('active');
     }
 
     /**
-     * Shows image and overlay
+     * Closes export window
      * @private
      */
-    function _showExportedImage(){
+    function _cancelExport(){
 
-      _image.show();
-      _overlay.show();
-
-      setTimeout(function() { // that's magic =( Need async, because jquery, probably, does 'show' too slow
-        _image.addClass(ACTIVE);
-        _overlay.css('opacity', OVERLAY_OPACITY);
-      }, 1);
-
-      var scale = _calculateScale(_image.height());
-      _setTransform(_image, 'scale(' + scale + ')');
-
-      _image.css({
-        top: MARGIN
-      });
-    }
-
-    /**
-     * Hide image and overlay begin
-     * @private
-     */
-    function _hideExportedImage(){
-
-      _overlay.css('opacity', 0);
-
-      _image.css(_defaultPosition);
-      _image.removeClass(ACTIVE);
-
-      _setTransform(_image, 'scale(' + 1 + ')');
       self.dispatchEvent(longpost.Exporter.EVENT.cancel);
+
+      _exportContainer.removeClass('active moveFromLeft');
+      _page.removeClass('scaleDown');
+
+      _exportContainer.addClass('moveToRight');
+      _page.addClass('scaleUp');
+
+      _image.attr('src', '');
+      _isImageShowed = false;
+      _image.removeClass('moveFromLeft');
+      _footer.removeClass('active');
+
+      _dontDoubleClickOverlay.hide();
+      _preloader.hide();
     }
 
     /**
-     * Handles transition end event (finally hide)
-     * @param e Event args
+     * Handles click to window
      * @private
      */
-    function _transitionComplete(e) {
+    function _handleClick(){
 
-      if(e.originalEvent.propertyName.match(/transform/)) {
+      if(_isImageShowed){
 
-        if (_enabled) {
-
-          _image.hide();
-          _image.attr('src', '');
-          _overlay.hide();
-          _enabled = false;
-
-        } else {
-
-          _enabled = true;
-          $('body').one('click', _hideExportedImage);
-
-        }
-
+        _cancelExport();
       }
     }
 
@@ -133,48 +122,55 @@
   };
 
   /**
-   * Calculates scale relative to the height of argument and height of document
-   * @param height Height of smth
-   * @returns {number} Scale
+   * Performs upload image to server
+   * @param dataUrl Base64 encoded image
+   * @returns {*|XMLHttpRequest}
    * @private
    */
-  function _calculateScale(height) {
+  function _performUploadImage(dataUrl) {
 
-    var docHeight = $(document).height() - MARGIN*2;
+    var blob = _dataURItoBlob(dataUrl);
+    var formData = new FormData();
+    formData.append("image", blob);
 
-    return docHeight / height;
-
-  }
-
-  /**
-   * Sets css transform
-   * @param element Target element
-   * @param transform Transform for element
-   * @private
-   */
-  function _setTransform(element, transform){
-
-    element.css({
-      '-moz-transform': transform,
-      '-ms-transform': transform,
-      '-webkit-transform': transform,
-      '-o-transform': transform,
-      'transform': transform
+    return $.ajax({
+      url: '/image/save',
+      data: formData,
+      processData: false,
+      contentType: false,
+      type: 'POST'
     });
   }
 
   /**
-   * Binds transition event
-   * @param element Target element
-   * @param listener Listener for event
+   * Converts Base64 encoded image to blob
+   * @param dataUrl Base64 encoded window
+   * @returns {Blob}
    * @private
    */
-  function _bindTransitionEnd(element, listener){
+  function _dataURItoBlob(dataUrl) {
+    var byteString,
+        mimestring;
 
-    element.bind('webkitTransitionEnd', listener);
-    element.bind('transitionend', listener);
-    element.bind('msTransitionEnd', listener);
-    element.bind('oTransitionEnd', listener);
+    if (dataUrl.split(',')[0].indexOf('base64') !== -1) {
+
+      byteString = atob(dataUrl.split(',')[1])
+
+    } else {
+
+      byteString = decodeURI(dataUrl.split(',')[1])
+
+    }
+
+    mimestring = dataUrl.split(',')[0].split(':')[1].split(';')[0]
+
+    var content = [];
+    for (var i = 0; i < byteString.length; i++) {
+
+      content[i] = byteString.charCodeAt(i)
+    }
+
+    return new Blob([new Uint8Array(content)], {type: mimestring});
   }
 
 })();

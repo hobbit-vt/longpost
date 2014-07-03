@@ -77,4 +77,9 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+
+  # Image config
+  config.image_path =  'images/'
+  config.image_ttl =  2.hours
+  config.image_schedule_timer = 20.minutes
 end

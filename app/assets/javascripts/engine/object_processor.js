@@ -44,21 +44,16 @@ longpost.ObjectProcessor = function(canvas){
 
     if(state !== null) {
 
-      var addedIds = [];
       canvas.loadFromJSON(state,
         function(){ //callback loading
 
-          _backStack.push({
-            ids: addedIds,
-            action: ACTION.add
-          });
+
           self.dispatchEvent(longpost.ObjectProcessor.EVENT.loadStateComplete);
 
         }, function(json, object){ //callback for every loaded object
 
-          addedIds.push(longpost.Helper.generateUUID());
-          _objects[addedIds[addedIds.length - 1]] = object;
-
+          _objects[longpost.Helper.generateUUID()] = object;
+          object.saveCurrentState();
         });
     }
   }

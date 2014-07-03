@@ -1,0 +1,46 @@
+$animation-speed: .6s;
+
+@import "mixins";
+
+.scaleUp {
+  @include animation(scaleUp $animation-speed ease-in);
+}
+.scaleDown {
+  @include animation(scaleDown $animation-speed ease-in);
+}
+
+.moveFromLeft {
+  @include animation(moveFromLeft $animation-speed ease);
+}
+
+.moveToRight {
+  @include animation(moveToRight $animation-speed ease);
+}
+
+@include keyframes(moveFromLeft) {
+  from {
+    -webkit-transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@include keyframes(moveToRight) {
+  to {
+    -webkit-transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@include keyframes(scaleUp) {
+  from {
+    -webkit-transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@include keyframes(scaleDown) {
+  to {
+    -webkit-transform: scale(.95);
+    opacity: 0;
+  }
+}

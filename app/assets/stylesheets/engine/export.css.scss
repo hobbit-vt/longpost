@@ -1,41 +1,67 @@
-$transition-delay: .25s;
+$export-z-index: 2;
 
-.exported-image {
-  -webkit-transition-duration: $transition-delay;
-  -moz-transition-duration: $transition-delay;
-  -o-transition-duration: $transition-delay;
-  transition-duration: $transition-delay;
+@import "animation";
 
-  -webkit-transition-property: transform, top,  box-shadow;
-  -moz-transition-property: transform, top, box-shadow;
-  -o-transition-property: transform, top, box-shadow;
-  transition-property: transform, top, box-shadow;
-
-  -webkit-transform-origin: 50% 0;
-  -moz-transform-origin: 50% 0;
-  -o-transform-origin: 50% 0;
-  -ms-transform-origin: 50% 0;
-  transform-origin: 50% 0;
-
-  &.active {
-    -webkit-box-shadow: 0 0 40px rgba(0,0,0,.5);
-    -moz-box-shadow: 0 0 40px rgba(0,0,0,.5);
-    box-shadow: 0 0 40px rgba(0,0,0,.5);
-  }
-}
-
-.exported-overlay {
-  position: fixed;
-  z-index: 2;
+.export-main {
+  visibility: hidden;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: black;
-  opacity: 0;
+  z-index: $export-z-index;
+  @include transition(visibility 0s ease $animation-speed);
 
-  -webkit-transition: opacity $transition-delay;
-  -moz-transition: opacity $transition-delay;
-  -o-transition: opacity $transition-delay;
-  transition: opacity $transition-delay;
+  &.active{
+    visibility: visible;
+    @include transition(none);
+  }
+}
+
+.export-header {
+  font-size: 5em;
+  position: relative;
+  z-index: $export-z-index + 1;
+  color: white;
+  text-align: center;
+
+  strong {
+    color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+.export-footer {
+  @extend .export-header;
+  visibility: hidden;
+
+  &.active {
+    visibility: visible;
+  }
+}
+
+.export-image {
+  position: relative;
+  display: block;
+  z-index: 3;
+  margin: 0 auto;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.export-overlay {
+  position: fixed;
+  z-index: $export-z-index;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #60d7a9;
+
+  .export-preload {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+  }
 }

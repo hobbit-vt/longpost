@@ -19,3 +19,18 @@
   -o-transform: $t_options;
   transform: $t_options;
 }
+
+@mixin animation($opt) {
+  -webkit-animation: $opt;
+  animation: $opt;
+}
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
