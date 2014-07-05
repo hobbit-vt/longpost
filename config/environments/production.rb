@@ -80,6 +80,6 @@ Rails.application.configure do
 
   # Image config
   config.image_path =  'images/'
-  config.image_ttl =  2.hours
-  config.image_schedule_timer = 20.minutes
+  config.image_ttl =  5.minutes
+  config.image_schedule_timer = 1.minutes
 end

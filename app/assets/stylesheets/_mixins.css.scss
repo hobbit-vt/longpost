@@ -24,6 +24,10 @@
   -webkit-animation: $opt;
   animation: $opt;
 }
+@mixin animation-delay($opt) {
+  -webkit-animation-delay: $opt;
+  animation-delay: $opt;
+}
 
 @mixin keyframes($name) {
   @-webkit-keyframes #{$name} {

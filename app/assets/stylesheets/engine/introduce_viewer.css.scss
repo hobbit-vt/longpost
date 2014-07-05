@@ -1,0 +1,26 @@
+$help-top-margin: 205px;
+$help-transition-speed: .6s;
+
+@import "mixins";
+
+.help-container {
+  position: absolute;
+  right: 0;
+  top: $help-top-margin;
+  visibility: hidden;
+  @include transition(visibility 0s ease $help-transition-speed);
+
+  .help-image {
+    opacity: 0;
+    @include transition(opacity $help-transition-speed ease-in-out);
+  }
+
+  &.active {
+    visibility: visible;
+    @include transition(none);
+
+    .help-image {
+      opacity: 1;
+    }
+  }
+}

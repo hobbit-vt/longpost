@@ -10,20 +10,14 @@ $footer_height: 30px;
   box-sizing: border-box;
 }
 
-html, body, .page {
-  height: 100%;
+html, body {
+  height:100%;
 }
 
 #wrapper {
   min-height: 100%;
-  margin-bottom: -$footer_height;
+  position: relative;
   background: #fafafa url("body-bg.jpg");
-
-  &:after {
-    content: "";
-    display: block;
-    height: $footer_height;
-  }
 }
 
 body, h1, h2, h3, h4, h5, h6, p, ul, input {
@@ -118,14 +112,21 @@ body > .toolbar-item { /* for saving stile when element drag */
 
 section {
   margin-top: $toolbar_height;
+  padding-bottom: $footer_height;
 }
 
 footer {
   font-family: $ext_font_family;
-  height: $footer_height - 1;
-  line-height: $footer_height - 1;
+  height: $footer_height;
+  line-height: $footer_height;
+  overflow: hidden;
   background-color: #fff;
   border-top: 1px solid #e1e8ed;
+
+  width:100%;
+  position:absolute;
+  bottom:0;
+  left:0;
 }
 
 

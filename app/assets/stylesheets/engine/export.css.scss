@@ -8,7 +8,7 @@ $export-z-index: 2;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   z-index: $export-z-index;
   @include transition(visibility 0s ease $animation-speed);
 
@@ -32,19 +32,27 @@ $export-z-index: 2;
 
 .export-footer {
   @extend .export-header;
-  visibility: hidden;
+  @include transition(opacity $animation-speed ease);
+  opacity: 0;
 
   &.active {
-    visibility: visible;
+    opacity: 1;
   }
 }
 
 .export-image {
   position: relative;
   display: block;
-  z-index: 3;
+  z-index: $export-z-index + 1;
   margin: 0 auto;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  visibility: hidden;
+  @include transition(visibility 0s ease $animation-speed);
+
+  &.active {
+    visibility: visible;
+    @include transition(none);
+  }
 }
 
 .export-overlay {

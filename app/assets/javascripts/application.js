@@ -23,4 +23,5 @@
 //= require engine/event_dispatcher.js
 //= require engine/outside_controller.js
 //= require engine/exporter.js
+//= require engine/introduce_viewer.js
 //= require engine/core.js

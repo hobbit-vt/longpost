@@ -1,0 +1,50 @@
+$animation-speed: .6s;
+
+@import "mixins";
+
+.scaleUp {
+  @include animation(scaleUp $animation-speed ease);
+}
+.scaleDown {
+  @include animation(scaleDown $animation-speed ease);
+}
+
+.moveFromLeft {
+  @include animation(moveFromLeft $animation-speed ease-out);
+}
+
+.moveToRight {
+  @include animation(moveToRight $animation-speed ease-in);
+}
+
+.delay300ms {
+  @include animation-delay(.3s);
+}
+
+@include keyframes(moveFromLeft) {
+  from {
+    @include transform(translateX(-100%));
+    opacity: 0;
+  }
+}
+
+@include keyframes(moveToRight) {
+  to {
+    @include transform(translateX(100%));
+    opacity: 0;
+  }
+}
+
+@include keyframes(scaleUp) {
+  from {
+    @include transform(scale(0.9, 0.99));
+    opacity: 0;
+  }
+}
+
+@include keyframes(scaleDown) {
+  to {
+    @include transform(scale(0.9, 0.99));
+    opacity: 0;
+  }
+}

@@ -1,12 +1,15 @@
 (function(){
 
+  var ANIMATION_TIME = 600; // hack =(
+
+  var EXPORT_CONTAINER = '[data-export]';
+  var PAGE_CONTAINER = '[data-page]';
+
   /**
    * Shows export page
-   * @param container Layout for exporter
-   * @param page Main page wrapper
    * @constructor
    */
-  longpost.Exporter = function(container, page) {
+  longpost.Exporter = function() {
 
     var self = this;
     longpost.EventDispatcher.prototype.apply(this);
@@ -23,8 +26,8 @@
 
     function constructor(){
 
-      _exportContainer = $(container);
-      _page = $(page);
+      _exportContainer = $(EXPORT_CONTAINER);
+      _page = $(PAGE_CONTAINER);
       _image = _exportContainer.find('.export-image');
       _footer = _exportContainer.find('.export-footer');
       _preloader = _exportContainer.find('.export-preload');
@@ -42,6 +45,7 @@
 
 
       _exportContainer.bind('click', _handleClick);
+      _image.bind('load', _imageLoaded);
     }
 
     /**
@@ -66,6 +70,14 @@
     };
 
     /**
+     * Cancels export
+     */
+    self.cancelExport = function(){
+
+      _cancelExport();
+    };
+
+    /**
      * Handles success upload image to server
      * @param data Image url
      * @private
@@ -73,9 +85,17 @@
     function _successUploadImage(data){
 
       _image.attr('src', data);
+    }
+
+    /**
+     * Handles image loaded event
+     * @private
+     */
+    function _imageLoaded(){
+
       _isImageShowed = true;
 
-      _image.addClass('moveFromLeft');
+      _image.addClass('active moveFromLeft');
       _footer.addClass('active');
     }
 
@@ -93,9 +113,11 @@
       _exportContainer.addClass('moveToRight');
       _page.addClass('scaleUp');
 
-      _image.attr('src', '');
+      setTimeout(function () { // hack =(
+        _image.removeAttr('src');
+      }, ANIMATION_TIME);
       _isImageShowed = false;
-      _image.removeClass('moveFromLeft');
+      _image.removeClass('active moveFromLeft');
       _footer.removeClass('active');
 
       _dontDoubleClickOverlay.hide();

@@ -1,35 +1,33 @@
-<div class="page">
-  <div id="wrapper">
+<div data-page id="wrapper">
 
-    <header>
-      <div class="inner">
-        <h1>
-          Longpost.me
-        </h1>
-        <h2>
-          Create your own long post
-        </h2>
-        <span data-toolbar-save class="no-select">Export</span>
-      </div>
-    </header>
+  <header itemscope>
+    <div class="inner">
+      <h1 itemprop="name">
+        Longpost.me
+      </h1>
+      <h2 itemprop="description">
+        Create your own long post
+      </h2>
+      <span data-toolbar-save class="no-select">Export</span>
+    </div>
+  </header>
 
-    <div id="toolbar">
-      <div class="inner clearfix">
-          <span data-toolbar-text id="text"  class="pull-left no-select toolbar-item">Text</span>
-          <span data-toolbar-clear id="clear" class="pull-left">Clear</span>
-          <span id="help" class="pull-right">Help</span>
+  <div id="toolbar">
+    <div class="inner clearfix">
+        <span data-toolbar-text id="text"  class="pull-left no-select toolbar-item">Text</span>
+        <span data-toolbar-clear id="clear" class="pull-left">Clear</span>
+        <span data-toolbar-help id="help" class="pull-right">Help</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="inner">
+      <div id="longpost">
+
       </div>
     </div>
+  </section>
 
-    <section>
-      <div class="inner">
-        <div id="longpost">
-
-        </div>
-      </div>
-    </section>
-
-  </div>
   <footer>
     <div class="inner">
       <span class="pull-right">
@@ -40,9 +38,10 @@
       </span>
     </div>
   </footer>
+
 </div>
 
-<div class="export-main no-select">
+<div data-export class="export-main no-select">
   <div class="export-overlay">
     <img src="/assets/loading-cylon-red.svg" width="256" height="32" class="export-preload"/>
   </div>
@@ -56,11 +55,14 @@
   </div>
 </div>
 
+<div data-help-container class="help-container">
+  <img src="/assets/help.png" class="help-image"/>
+</div>
+
 
 <script type="text/javascript" charset="utf-8">
 
-  var exporter = new longpost.Exporter('.export-main', '.page');
-  var lp = new longpost.Core($('#longpost'), exporter);
+  var lp = new longpost.Core('#longpost');
 
   $('#toolbar').stick();
 

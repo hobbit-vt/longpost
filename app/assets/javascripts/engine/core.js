@@ -1,7 +1,7 @@
 (function(){
 
-  var WATERMARK_TEXT = 'LongPost.me';
-  var WATERMARK_SIZE = 11;
+  var WATERMARK_TEXT = 'longpost.me';
+  var WATERMARK_SIZE = 18;
   var WATERMARK_PADDING = 5;
 
   var DEFAULT_OPTIONS = {
@@ -29,7 +29,7 @@
    * @param domElement Dom element for action
    * @constructor
    */
-  longpost.Core = function(domElement, exporter){
+  longpost.Core = function(domElement){
 
     var self = this;
 
@@ -41,6 +41,7 @@
     var _outsideController = null;
     var _objectsProcessor = null;
     var _imageExporter = null;
+    var _introduceViewer = null;
 
     var _waterMark;
 
@@ -52,8 +53,9 @@
       _objectsProcessor.addEvent(longpost.ObjectProcessor.EVENT.loadStateComplete, _optimizeCanvasSize);
       _optimizeCanvasSize();
 
-      _imageExporter = exporter;
-      _imageExporter.addEvent(longpost.Exporter.EVENT.cancel, _onCancelExport);
+      _imageExporter = new longpost.Exporter();
+
+      _introduceViewer = new longpost.IntroduceViewer();
 
       _outsideController = new longpost.OutsideController(self);
       _outsideController.addEvent(longpost.OutsideController.EVENT.imageDrop, self.addImage);
@@ -65,6 +67,7 @@
       _outsideController.addEvent(longpost.OutsideController.EVENT.addText, _onAddText);
       _outsideController.addEvent(longpost.OutsideController.EVENT.dropText, _onDropText);
       _outsideController.addEvent(longpost.OutsideController.EVENT.save, _onSave);
+      _outsideController.addEvent(longpost.OutsideController.EVENT.help, _onHelp);
       _outsideController.addEvent(longpost.OutsideController.EVENT.selectAll, _selectAll);
 
       _canvas.on('mouse:down', _onCanvasMouseDown);
@@ -569,6 +572,10 @@
         fontSize: WATERMARK_SIZE,
         fontFamily: 'Arial',
         fontWeight: 'bold',
+        //fill: 'white',
+        backgroundColor: 'white',
+        //stroke: '#555',
+        //strokeWidth: 1.2,
         left: WATERMARK_PADDING
       });
     }
@@ -717,12 +724,14 @@
             quality: IMAGE_QUALITY
         })
       );
-    }
-
-    function _onCancelExport() {
-
       _removeWaterMark();
     }
+
+    function _onHelp(){
+
+      _introduceViewer.show();
+    }
+
 
     constructor();
 

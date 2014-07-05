@@ -1,8 +1,9 @@
 (function(){
 
-  var TOOLBAR_TEXT = 'data-toolbar-text';
-  var TOOLBAR_CLEAR = 'data-toolbar-clear';
-  var TOOLBAR_SAVE = 'data-toolbar-save'
+  var TOOLBAR_TEXT = '[data-toolbar-text]';
+  var TOOLBAR_CLEAR = '[data-toolbar-clear]';
+  var TOOLBAR_SAVE = '[data-toolbar-save]';
+  var TOOLBAR_HELP = '[data-toolbar-help]';
 
   /**
    * Controller for outside events
@@ -39,15 +40,20 @@
      */
     function _initToolbar(){
 
-      var textButton = $('['+ TOOLBAR_TEXT +']');
+      var textButton = $(TOOLBAR_TEXT);
       textButton.draggable();
       textButton.bind('dropped', _textToolbarDropSuccess);
       textButton.bind('mousedown', _textToolbarMouseDown);
       textButton.bind('mouseup', _textToolbarMouseUp);
-      var clearButton = $('['+ TOOLBAR_CLEAR +']');
+
+      var clearButton = $(TOOLBAR_CLEAR);
       clearButton.bind('click', _clearToolbarClick);
-      var saveButton = $('['+ TOOLBAR_SAVE +']');
+
+      var saveButton = $(TOOLBAR_SAVE);
       saveButton.bind('click', _saveToolbarClick);
+
+      var helpButton = $(TOOLBAR_HELP);
+      helpButton.bind('click', _helpToolbarClick);
     }
 
     /**
@@ -186,6 +192,11 @@
       self.dispatchEvent(longpost.OutsideController.EVENT.save);
     }
 
+    function _helpToolbarClick(){
+
+      self.dispatchEvent(longpost.OutsideController.EVENT.help);
+    }
+
     constructor();
 
   };
@@ -200,7 +211,8 @@
     dropText: 'dropText',
     addText: 'text',
     clearObjects: 'clearObjects',
-    save: 'save'
+    save: 'save',
+    help: 'help'
   };
 
 })();
