@@ -516,6 +516,7 @@
 
         _objectsProcessor.remove([ _canvas.getActiveObject() ]);
       }
+      _optimizeCanvasSize();
     }
 
     /**
@@ -727,6 +728,10 @@
       _removeWaterMark();
     }
 
+    /**
+     * Handles, that user want to see help
+     * @private
+     */
     function _onHelp(){
 
       _introduceViewer.show();
