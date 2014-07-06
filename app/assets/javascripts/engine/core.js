@@ -293,7 +293,7 @@
       console.time('s');
       var objProps = object.getPropertiesSafely();
 
-      console.log(objProps);
+      //console.log(objProps);
 
       var div,
           groupAddition = {
@@ -700,7 +700,11 @@
      */
     function _onDropText(e){
 
-      var pointer = _canvas.getPointer(e);
+      var offset = _container.offset();
+      var pointer = {
+        x: e.pageX - offset.left,
+        y: e.pageY - offset.top
+      };
 
       if (!(pointer.x < 0 || pointer.y < 0 ||
         pointer.x > _canvas.width || pointer.y > _canvas.height)) {

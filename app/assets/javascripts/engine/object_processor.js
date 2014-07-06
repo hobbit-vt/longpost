@@ -114,7 +114,7 @@ longpost.ObjectProcessor = function(canvas){
     for(var i = 0; i < ids.length; i++){
 
       props.push(longpost.Helper.clone(objects[i].currentState));
-      console.log(objects[i].currentState);
+      //console.log(objects[i].currentState);
       objects[i].saveCurrentState();
     }
 
