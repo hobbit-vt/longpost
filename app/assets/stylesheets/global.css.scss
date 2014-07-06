@@ -113,6 +113,12 @@ body > .toolbar-item { /* for saving stile when element drag */
 section {
   margin-top: $toolbar_height;
   padding-bottom: $footer_height;
+
+  #longpost {
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
 footer {
