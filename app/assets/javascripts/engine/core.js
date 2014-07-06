@@ -290,7 +290,7 @@
      * @private
      */
     function _processStickToSmth(object){
-      console.time('s');
+      //console.time('s');
       var objProps = object.getPropertiesSafely();
 
       //console.log(objProps);
@@ -499,7 +499,7 @@
       //if need to stick to something
       nearestHorizontal.action && nearestHorizontal.action();
       nearestVertical.action && nearestVertical.action();
-      console.timeEnd('s');
+      //console.timeEnd('s');
     }
 
     /**
