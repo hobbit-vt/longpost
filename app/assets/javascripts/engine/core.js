@@ -281,7 +281,7 @@
 
         _resizingCanvas.getContext("2d").drawImage(img, 0, 0, img.width, img.height);
 
-        callback(_resizingCanvas.toDataURL('image/jpeg', IMAGE_QUALITY));
+        callback(_resizingCanvas.toDataURL('image/png', IMAGE_QUALITY));
       };
     }
 

@@ -15,7 +15,7 @@
 //= require jquery.top_sticker
 //= require jquery.draggable
 
-//= require fabric.js
+//= require libs/fabric.js
 //= require extend_fabric_object.js
 //= require engine/main.js
 //= require engine/helper.js
@@ -25,3 +25,6 @@
 //= require engine/exporter.js
 //= require engine/introduce_viewer.js
 //= require engine/core.js
+
+//= require libs/html2canvas
+//= require text_editor

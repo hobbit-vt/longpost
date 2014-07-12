@@ -46,6 +46,7 @@
 
       _exportContainer.bind('click', _handleClick);
       _image.bind('load', _imageLoaded);
+      _image.bind('error', _imageLoaded);
     }
 
     /**
