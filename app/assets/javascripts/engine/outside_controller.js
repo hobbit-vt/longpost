@@ -132,7 +132,6 @@
         if(e.metaKey || e.ctrlKey) {
 
           self.dispatchEvent(longpost.OutsideController.EVENT.back);
-          e.preventDefault();
         }
 
       } else if(e.which === 68) { // press d
@@ -140,20 +139,21 @@
         if(e.metaKey || e.ctrlKey) {
 
           self.dispatchEvent(longpost.OutsideController.EVENT.clearSelection);
-          e.preventDefault();
         }
 
       } else if(e.which === 8 || e.which === 46) { // press delete or backspace
 
         self.dispatchEvent(longpost.OutsideController.EVENT.delete);
-        e.preventDefault();
+        if(e.target.nodeName === 'BODY') {
+
+          e.preventDefault();
+        }
 
       } else if(e.which === 65) { // press a
 
         if(e.metaKey || e.ctrlKey) {
 
           self.dispatchEvent(longpost.OutsideController.EVENT.selectAll);
-          e.preventDefault();
         }
       }
     }

@@ -43,7 +43,7 @@
 
 <div data-export class="export-main no-select">
   <div class="export-overlay">
-    <img src="/assets/loading-cylon-red.svg" width="256" height="32" class="export-preload"/>
+    <%= image_tag('loading-cylon-red.svg', {width: 256, height: 32, class: 'export-preload'}) %>
   </div>
   <div class="export-loader"></div>
   <div class="export-header">
@@ -56,14 +56,21 @@
 </div>
 
 <div data-help-container class="help-container">
-  <img src="/assets/help.png" class="help-image"/>
+  <%= image_tag('help.png', {class: 'help-image'}) %>
 </div>
 
+
+<div class="test" style="position: absolute; top: 260px; left: 50px;">
+
+</div>
 
 <script type="text/javascript" charset="utf-8">
 
   var lp = new longpost.Core('#longpost');
 
   $('#toolbar').stick();
+
+  var editor = new ste.Editor('.test');
+  editor.init();
 
 </script>

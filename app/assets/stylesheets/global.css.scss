@@ -5,6 +5,7 @@ $toolbar_height: $base_font_size * 1.5 + 5 * 2 + 3; /* * font-size  + padding * 
 $footer_height: 30px;
 
 @import 'mixins';
+@import 'font_awesome';
 
 *, *:after, *:before {
   box-sizing: border-box;
@@ -26,7 +27,7 @@ body, h1, h2, h3, h4, h5, h6, p, ul, input {
 }
 
 body {
-  font: 1em 'Helvetica Neue', Helvetica, Arial, serif;
+  font: 1em 'Helvetica Neue', Helvetica, Arial, serif;;
   line-height: 1.5;
   font-weight: 400;
   background: #333;
